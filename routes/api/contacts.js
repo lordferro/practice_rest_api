@@ -1,54 +1,21 @@
 const express = require("express");
-const Joi = require("joi");
 
-const contacts = require("../../models/contacts");
+const ctrl = require("../../controllers/contacts");
 
-const { HttpError } = require("../../helpers");
+const { validateBody } = require('../../middelwares')
+
+const schemas = require('../../schemas/contacts')
 
 const router = express.Router();
 
-const addSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.number().required(),
-});
+router.get("/", ctrl.getAll);
 
-router.get("/", async (req, res, next) => {
-  try {
-    const result = await contacts.listContacts();
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+router.get("/:id", ctrl.getById );
 
-router.get("/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const result = await contacts.getContactById(id);
-    if (!result) {
-      throw HttpError(404, "Not found");
-      // const error = new Error('Not found');
-      // error.status = 404;
-      // throw error;
-    }
-    return res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+router.post("/", validateBody(schemas.addSchema), ctrl.add);
 
-router.post("/", async (req, res, next) => {
-  try {
-    const { error } = addSchema.validate(req.body)
-    if (error) {
-     throw HttpError(400, error.message)
-   }
-    const result = await contacts.addContact(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+router.put("/:id", validateBody(schemas.addSchema), ctrl.editById);
+
+router.delete("/:id", ctrl.deleteById);
 
 module.exports = router;
