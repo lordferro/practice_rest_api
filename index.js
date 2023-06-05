@@ -49,7 +49,7 @@ const logger = async (msg) => {
     await fs.appendFile(logFile, `${msg}\n`);
     console.log(`succesfully saved game results to the file ${logFile}`.yellow);
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 };
 
@@ -78,6 +78,13 @@ const game = () => {
       return game();
     }
     console.log(`Yeah, it take ${counter} attemps`.magenta);
+
+    logger(
+      `${new Date().toLocaleString(
+        "uk-UK"
+      )}: Congrats, it take ${counter} attemps`
+    );
+
     rl.close();
   });
 };
